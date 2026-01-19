@@ -1,18 +1,14 @@
 import streamlit as st
+import os
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
-load_dotenv()
+workout_model = ChatHuggingFace(model_id="meta-llama/Llama-2-7b-chat-hf")
 
-llm = HuggingFaceEndpoint(
-    repo_id="TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-    task="text-generation"
-)
-
-workout_model = ChatHuggingFace(llm=llm)
-diet_model = ChatHuggingFace(llm=llm)
+diet_model = ChatHuggingFace(model_id="meta-llama/Llama-2-7b-chat-hf")
 
 # bmi and calorie calculations
 def calculate_bmi(weight, height_cm):
@@ -97,18 +93,18 @@ if st.button("Generate My Plan"):
     st.subheader("📊 Your Stats")
     st.write(f"**BMI:** {bmi}")
     st.write(f"**Daily Calories Target:** {calories}")
-
-   # workout = workout_model.invoke("what is capital of india")
-
-    #diet_plan = diet_model.invoke(Diet_prompt)
+    
+    workout = workout_model.invoke("what is capital of india")
+    
+    diet_plan = diet_model.invoke(Diet_prompt)
 
     
 
     st.subheader("🏋️ Workout Plan")
-   # st.write(workout.content)
+    st.write(workout.content)
 
     st.subheader("🍛 Diet Plan")
+    st.write(diet_plan.content)
 
-    #st.write(diet_plan.content)
 
 
