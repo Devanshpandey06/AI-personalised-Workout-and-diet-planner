@@ -98,9 +98,9 @@ if st.button("Generate My Plan"):
     st.write(f"**BMI:** {bmi}")
     st.write(f"**Daily Calories Target:** {calories}")
 
-    workout = workout_model.invoke(Workout_prompt)
+    workout = workout_model.invoke("what is capital of india")
 
-    diet_plan = diet_model.invoke(Diet_prompt)
+    #diet_plan = diet_model.invoke(Diet_prompt)
 
     
 
@@ -109,4 +109,5 @@ if st.button("Generate My Plan"):
 
     st.subheader("🍛 Diet Plan")
 
-    st.write(diet_plan.content)
+    #st.write(diet_plan.content)
+
