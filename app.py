@@ -94,18 +94,19 @@ Diet_prompt = diet_prompt.invoke({
 
 if st.button("Generate My Plan"):
     bmi = calculate_bmi(weight, height)
-    
+    st.subheader("📊 Your Stats")
+    st.write(f"**BMI:** {bmi}")
+    st.write(f"**Daily Calories Target:** {calories}")
 
     workout = workout_model.invoke(Workout_prompt)
 
     diet_plan = diet_model.invoke(Diet_prompt)
 
-    st.subheader("📊 Your Stats")
-    st.write(f"**BMI:** {bmi}")
-    st.write(f"**Daily Calories Target:** {calories}")
+    
 
     st.subheader("🏋️ Workout Plan")
     st.write(workout.content)
 
     st.subheader("🍛 Diet Plan")
+
     st.write(diet_plan.content)
