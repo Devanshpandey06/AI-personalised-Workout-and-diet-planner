@@ -1,99 +1,98 @@
 import streamlit as st
-from openai import OpenAI
+from huggingface_hub import InferenceClient
 
 # --- UI CONFIGURATION ---
-st.set_page_config(page_title="StudentFit AI", page_icon="🎓", layout="centered")
+st.set_page_config(page_title="OpenStudentFit", page_icon="🥗", layout="centered")
 
-# Custom CSS for a clean look
+# Custom CSS
 st.markdown("""
     <style>
-    .main { background-color: #f5f7f9; }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #FF4B4B; color: white; }
+    .stApp { background-color: #f0f2f6; }
+    .stButton>button { background-color: #007bff; color: white; border-radius: 8px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR: API SETUP ---
+# --- SIDEBAR: HUGGING FACE SETUP ---
 with st.sidebar:
-    st.title("Settings")
-    api_key = st.text_input("Enter OpenAI API Key", type="password")
-    st.info("Your key is used only for this session.")
+    st.title("🛡️ API Settings")
+    hf_token = st.text_input("Enter Hugging Face Token", type="password", help="Get your free token at hf.co/settings/tokens")
+    model_choice = st.selectbox("Select Open Source Model", [
+        "mistralai/Mistral-7B-Instruct-v0.3",
+        "meta-llama/Llama-3.2-3B-Instruct",
+        "HuggingFaceH4/zephyr-7b-beta"
+    ])
+    st.info("The Inference API is free but has rate limits.")
 
 # --- APP HEADER ---
-st.title("🎓 StudentFit AI")
-st.subheader("Personalized Health for Student Budgets & Lifestyles")
+st.title("🥗 OpenStudentFit AI")
+st.markdown("### Budget-Friendly & Cultural AI Health Planner")
 
-# --- STEP 1: PHYSICAL STATS ---
-with st.expander("Step 1: Physical Profile", expanded=True):
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        age = st.number_input("Age", 18, 100, 20)
-        gender = st.selectbox("Gender", ["Male", "Female"])
-    with col2:
-        weight = st.number_input("Weight (kg)", 40, 200, 70)
-        height = st.number_input("Height (cm)", 120, 230, 175)
-    with col3:
-        activity = st.selectbox("Activity Level", [
-            "Sedentary", "Lightly Active", "Moderately Active", "Very Active"
-        ])
-
-# --- STEP 2: STUDENT CONSTRAINTS ---
-with st.expander("Step 2: Student Constraints", expanded=True):
-    c1, c2 = st.columns(2)
-    with c1:
-        budget = st.select_slider("Daily Food Budget", options=["Tight (Ramen/Eggs)", "Moderate (Groceries)", "Flexible"])
-        culture = st.text_input("Cultural Diet (e.g., Indian Veg, Mediterranean, Halal)", "General")
-    with c2:
-        equipment = st.multiselect("Available Equipment", ["None (Bodyweight)", "Dumbbells", "Resistance Bands", "Full Gym"])
-        allergies = st.text_input("Allergies/Dislikes", "None")
-
-# --- CALCULATION LOGIC ---
+# --- STEP 1: CALCULATIONS ---
 def calculate_tdee(weight, height, age, gender, activity):
     # Mifflin-St Jeor Equation
-    if gender == "Male":
-        bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
-    else:
-        bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
-    
+    s = 5 if gender == "Male" else -161
+    bmr = (10 * weight) + (6.25 * height) - (5 * age) + s
     multipliers = {"Sedentary": 1.2, "Lightly Active": 1.375, "Moderately Active": 1.55, "Very Active": 1.725}
     return round(bmr * multipliers[activity])
 
-# --- GENERATION LOGIC ---
-if st.button("Generate My Personalized Plan"):
-    if not api_key:
-        st.error("Please enter your OpenAI API Key in the sidebar.")
+# --- STEP 2: USER INPUTS ---
+col1, col2 = st.columns(2)
+with col1:
+    age = st.number_input("Age", 18, 100, 20)
+    gender = st.selectbox("Gender", ["Male", "Female"])
+    weight = st.number_input("Weight (kg)", 40, 200, 70)
+    height = st.number_input("Height (cm)", 120, 230, 175)
+
+with col2:
+    activity = st.selectbox("Activity Level", ["Sedentary", "Lightly Active", "Moderately Active", "Very Active"])
+    budget = st.select_slider("Budget", options=["Student/Low", "Moderate", "High"])
+    culture = st.text_input("Cuisine (e.g., Nigerian, Indian, Vegan)", "Global")
+    equipment = st.text_input("Equipment (e.g., No gym, Dumbbells)", "No gym")
+
+# --- STEP 3: GENERATE PLAN ---
+if st.button("Generate My Open-Source Plan"):
+    if not hf_token:
+        st.warning("⚠️ Please provide a Hugging Face Access Token in the sidebar.")
     else:
-        client = OpenAI(api_key=api_key)
+        # 1. Calculate Target
         tdee = calculate_tdee(weight, height, age, gender, activity)
         
-        with st.spinner("Analyzing constraints and optimizing your plan..."):
-            prompt = f"""
-            System: You are a high-performance fitness coach and nutritionist specialized in student life.
-            User Profile:
-            - Daily Calorie Target (TDEE): {tdee} kcal
-            - Budget: {budget}
-            - Culture/Cuisine: {culture}
-            - Equipment: {equipment}
-            - Allergies: {allergies}
-            
-            Task: Provide a 1-day sample plan.
-            1. DIET: Must be budget-friendly for a student. Focus on {culture} staples. Include local/cheap protein sources.
-            2. WORKOUT: A 30-minute routine using only {equipment}. 
-            3. STUDENT TIP: One tip on how to meal prep in a dorm or stay healthy during exams.
-            
-            Format the response with clear headings and bullet points.
-            """
+        # 2. Initialize Hugging Face Client
+        client = InferenceClient(model=model_choice, token=hf_token)
+        
+        # 3. Build Prompt
+        prompt = f"""<s>[INST] You are a budget-conscious student health coach. 
+        Create a 1-day plan for a student with:
+        - Calorie Goal: {tdee} kcal
+        - Budget: {budget}
+        - Cultural Preference: {culture}
+        - Equipment: {equipment}
 
+        Structure your response as follows:
+        ### 🍽️ Budget {culture} Meal Plan
+        (List Breakfast, Lunch, and Dinner with cheap ingredients)
+        
+        ### 🏃 Workout ({equipment})
+        (List 4-5 exercises)
+        
+        ### 💡 Student Hack
+        (One tip for dorm life)
+        [/INST]"""
+
+        with st.spinner(f"Requesting {model_choice}..."):
             try:
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[{"role": "user", "content": prompt}]
+                # Call the Inference API
+                response = client.text_generation(
+                    prompt, 
+                    max_new_tokens=800, 
+                    temperature=0.7,
+                    return_full_text=False
                 )
                 
-                st.success("Your Plan is Ready!")
+                st.success(f"Plan Generated for {tdee} Calories!")
                 st.markdown("---")
-                st.markdown(f"### 🔥 Estimated Daily Burn: {tdee} Calories")
-                st.markdown(response.choices[0].message.content)
+                st.markdown(response)
+                
             except Exception as e:
-                st.error(f"An error occurred: {e}")
-
+                st.error(f"Error: {e}. The model might be loading. Try again in 30 seconds.")
 
