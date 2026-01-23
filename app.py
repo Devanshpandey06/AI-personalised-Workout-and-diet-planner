@@ -11,6 +11,12 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+st.markdown("""
+<div class="footer">
+    © 2026 Workout and Diet Planner • Built with ❤️ by Devansh Pandey
+</div>
+""", unsafe_allow_html=True)
+
 # --- SIDEBAR: HUGGING FACE SETUP ---
 with st.sidebar:
     st.title("🛡️ API Settings")
@@ -94,6 +100,7 @@ if st.button("Generate My Open-Source Plan"):
                 
             except Exception as e:
                 st.error(f"Error: {e}. Ensure your token is correct and the model is available.")
+
 
 
 
