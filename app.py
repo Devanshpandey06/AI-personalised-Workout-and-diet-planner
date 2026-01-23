@@ -69,7 +69,6 @@ if st.button("Generate My Open-Source Plan"):
                 - Budget: {budget}
                 - Cultural Preference: {culture}
                 - Equipment: {equipment}
-                - Allergies: {allergies}
 
                 Format with clear headings: 🍽️ Meal Plan, 🏃 Workout, and 💡 Student Hack."""
             }
@@ -99,3 +98,4 @@ if st.button("Generate My Open-Source Plan"):
                 
             except Exception as e:
                 st.error(f"Error: {e}. Ensure your token is correct and the model is available.")
+
