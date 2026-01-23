@@ -10,7 +10,7 @@ st.markdown("""
     .stButton>button { background-color: #007bff; color: white; border-radius: 8px; }
     </style>
     """, unsafe_allow_html=True)
-st.caption("© 2026 Workout and Diet Planner • Built with ❤️ by Devansh Pandey")
+
 
 # --- SIDEBAR: HUGGING FACE SETUP ---
 with st.sidebar:
@@ -95,6 +95,8 @@ if st.button("Generate My Open-Source Plan"):
                 
             except Exception as e:
                 st.error(f"Error: {e}. Ensure your token is correct and the model is available.")
+st.caption("© 2026 Workout and Diet Planner • Built with ❤️ by Devansh Pandey")
+
 
 
 
