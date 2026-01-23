@@ -16,9 +16,7 @@ with st.sidebar:
     st.title("🛡️ API Settings")
     hf_token = st.text_input("Enter Hugging Face Token", type="password", help="Get your free token at hf.co/settings/tokens")
     model_choice = st.selectbox("Select Open Source Model", [
-        "mistralai/Mistral-7B-Instruct-v0.3",
-        "meta-llama/Llama-3.2-3B-Instruct",
-        "HuggingFaceH4/zephyr-7b-beta"
+        "meta-llama/Llama-3.2-3B-Instruct"
     ])
     st.info("The Inference API is free but has rate limits.")
 
@@ -98,4 +96,5 @@ if st.button("Generate My Open-Source Plan"):
                 
             except Exception as e:
                 st.error(f"Error: {e}. Ensure your token is correct and the model is available.")
+
 
