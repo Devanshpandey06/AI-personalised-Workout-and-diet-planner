@@ -8,6 +8,12 @@ st.set_page_config(page_title="Workout and Diet planner", page_icon="🥗", layo
 st.markdown("""
     <style>
     .stButton>button { background-color: #007bff; color: white; border-radius: 8px; }
+    .footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #777;
+    font-size: 15px;
+}
     </style>
     """, unsafe_allow_html=True)
 
@@ -20,7 +26,7 @@ with st.sidebar:
     st.info("The Inference API is free but has rate limits.")
 
 # --- APP HEADER ---
-st.title("🥗 OpenStudentFit AI")
+st.title("🥗 Workout and Diet planner with AI")
 st.markdown("### Budget-Friendly & Cultural AI Health Planner")
 
 # --- STEP 1: CALCULATIONS ---
@@ -95,7 +101,12 @@ if st.button("Generate My Open-Source Plan"):
                 
             except Exception as e:
                 st.error(f"Error: {e}. Ensure your token is correct and the model is available.")
-st.caption("© 2026 Workout and Diet Planner • Built with ❤️ by Devansh Pandey")
+st.markdown("""
+<div class="footer">
+    © 2025 Workout and Diet planner• Built with ❤️ by Devansh Pandey
+</div>
+""", unsafe_allow_html=True)
+
 
 
 
